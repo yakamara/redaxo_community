@@ -31,30 +31,35 @@ class rex_ycom_media_auth extends \rex_yform_manager_dataset
 
     public static function checkFrontendPerm(\rex_media $rex_media)
     {
-        $authType = (int) $rex_media->getValue('ycom_auth_type');
-        $groupType = (int) $rex_media->getValue('ycom_group_type');
-        $groups = [];
-        if ('' != $rex_media->getValue('ycom_groups')) {
-            $groups = explode(',', $rex_media->getValue('ycom_groups'));
-        }
+		$authType = (int) $rex_media->getValue('ycom_auth_type');
 
-        if (1 != $authType) {
-            return true;
-        }
+		if (1 != $authType) {
+			return true;
+		}
 
-        // from here only logged in Users
+		// from here only logged in Users
+		$me = rex_ycom_user::getMe();
 
-        $me = rex_ycom_user::getMe();
+		if (!$me) {
+			return false;
+		}
 
-        if (!$me) {
-            return false;
-        }
+		// Check group permissions only if group plugin is installed
+		if(!rex_plugin::get('ycom', 'group')->isAvailable()) {
+			return true;
+		}
 
-        $userGroups = [];
-        if ('' != $me->getValue('ycom_groups')) {
-            $userGroups = explode(',', $me->getValue('ycom_groups'));
-        }
+		$groupType = (int) $rex_media->getValue('ycom_group_type');
+		$groups = [];
+		if ('' != $rex_media->getValue('ycom_groups')) {
+			$groups = explode(',', $rex_media->getValue('ycom_groups'));
+		}
+		
+		$userGroups = [];
+		if ('' != $me->getValue('ycom_groups')) {
+			$userGroups = explode(',', $me->getValue('ycom_groups'));
+		}
 
-        return rex_ycom_group::hasGroupPerm($groupType, $groups, $userGroups);
+		return rex_ycom_group::hasGroupPerm($groupType, $groups, $userGroups);
     }
 }
