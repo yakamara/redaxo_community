@@ -46,13 +46,8 @@ if($ycom_user) {
 **Gruppen-Berechtigung eines YCom-Nutzers auslesen:**
 
 ```
-$article_id = 42; // ID des Artikels
-$ycom_user = rex_ycom_auth::getUser();
-if($ycom_user->checkPerm($article_id)) {
-    // User hat Berechtigung, den Artikel zu sehen  
-} else {
-    // User hat nicht die Berechtigung, den Artikel zu sehen
-};
+$category = rex_category::get($id);
+rex_ycom_auth::articleIsPermitted($category); // => true oder false
 ```
 Weitere Methoden der rex_ycom_auth-Klasse: https://github.com/yakamara/redaxo_ycom/blob/master/plugins/auth/lib/ycom_auth.php
 
