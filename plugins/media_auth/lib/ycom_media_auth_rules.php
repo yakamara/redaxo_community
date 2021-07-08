@@ -56,7 +56,13 @@ class rex_ycom_media_auth_rules
                     }
                     exit;
                 }
-                rex_redirect($rule['action']['article_id'], '', ['returnTo' => $_SERVER['REQUEST_URI']]);
+                
+                $clang_id = 1;
+                $yr_domain = rex_sql::factory()->setTable(rex::getTable('yrewrite_domain'))->setWhere('domain LIKE :domain',['domain'=>'%'.$_SERVER['HTTP_HOST'].'%'])->select()->getArray();
+                if (count($yr_domain) == 1) {
+                    $clang_id = $yr_domain[0]['clang_start'];
+                }
+                rex_redirect($rule['action']['article_id'], $clang_id, ['returnTo' => $_SERVER['REQUEST_URI']]);
                 break;
             case 'redirect_wo_returnto':
                 rex_redirect($rule['action']['article_id'], '', []);
